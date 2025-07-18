@@ -1,5 +1,12 @@
 # ShaadiCircle Web Media Feed - Project Overview
 
+## Progress
+
+- [x] Create React project with TypeScript (using Vite)
+- [x] Set up Redux Toolkit (RTK) with slices (create postSlice)
+- [x] Configure routing (React Router DOM v6)
+- [ ] Add styled-components for scoped and reusable styling
+
 ## Tech Stack
 
 - React.js (with TypeScript)
