@@ -1,0 +1,1 @@
+export { default as postsReducer, setPosts, addPost, setStatus, setError } from './postsSlice'; 
