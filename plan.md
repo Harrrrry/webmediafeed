@@ -1,13 +1,13 @@
 # Development Plan - ShaadiCircle Web Media Feed
 
 ## Phase 1: Frontend Setup & Infrastructure
-- [ ] Create React project with TypeScript  
+- [x] Create React project with TypeScript  
   - Use Vite for faster setup and lightweight dev server
-- [ ] Set up Redux Toolkit (RTK) with slices  
+- [x] Set up Redux Toolkit (RTK) with slices  
   - Create `postSlice` with initial state for posts, status, error
-- [ ] Configure routing if needed  
+- [x] Configure routing if needed  
   - Use React Router DOM v6 (optional if multiple views planned)
-- [ ] Add styled-components for scoped and reusable styling
+- [x] Add styled-components for scoped and reusable styling
 
 ## Phase 2: Backend Setup (NestJS) & Database
 - [ ] Initialize NestJS backend project  
