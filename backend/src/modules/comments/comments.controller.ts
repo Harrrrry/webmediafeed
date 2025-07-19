@@ -1,22 +1,34 @@
-import { Controller, Get, Post, Body, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, UseGuards, Req } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { CommentsService } from './comments.service';
+import { Request } from 'express';
 
 @Controller('comments')
 export class CommentsController {
+  constructor(private readonly commentsService: CommentsService) {}
+
   @Get('post/:postId')
   findByPost(@Param('postId') postId: string) {
-    return `List comments for post ${postId}`;
+    return this.commentsService.findByPost(postId);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('post/:postId')
-  create(@Param('postId') postId: string, @Body() createCommentDto: any) {
-    return `Add comment to post ${postId}`;
+  create(
+    @Param('postId') postId: string,
+    @Body() dto: { text: string },
+    @Req() req: Request,
+  ) {
+    // @ts-ignore
+    const userId = req.user.userId;
+    return this.commentsService.create(postId, userId, dto.text);
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return `Delete comment ${id}`;
+  remove(@Param('id') id: string, @Req() req: Request) {
+    // @ts-ignore
+    const userId = req.user.userId;
+    return this.commentsService.remove(id, userId);
   }
 } 
