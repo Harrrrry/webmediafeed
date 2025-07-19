@@ -7,6 +7,8 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { MediaModule } from './modules/media/media.module';
 import { AiModule } from './modules/ai/ai.module';
+import { PostsModule } from './modules/posts/posts.module';
+import { CommentsModule } from './modules/comments/comments.module';
 
 @Module({
   imports: [
@@ -16,6 +18,8 @@ import { AiModule } from './modules/ai/ai.module';
     UsersModule,
     MediaModule,
     AiModule,
+    PostsModule,
+    CommentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

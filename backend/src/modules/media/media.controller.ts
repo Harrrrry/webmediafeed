@@ -1,12 +1,22 @@
 import { Controller, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 
 @Controller('media')
 export class MediaController {
   @Post('upload')
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('file', {
+    storage: diskStorage({
+      destination: './uploads',
+      filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+        cb(null, uniqueSuffix + extname(file.originalname));
+      },
+    }),
+  }))
   uploadFile(@UploadedFile() file: Express.Multer.File) {
-    // Placeholder: return file info (integration with Cloudinary/Firebase can be added later)
-    return { filename: file?.originalname, size: file?.size };
+    // Return the local file URL (in production, use Cloudinary/Firebase)
+    return { url: `/uploads/${file.filename}` };
   }
 }

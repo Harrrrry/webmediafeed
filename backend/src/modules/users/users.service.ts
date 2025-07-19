@@ -24,7 +24,7 @@ export class UsersService {
     if (!user) throw new UnauthorizedException('Invalid credentials');
     const valid = await this.authService.comparePasswords(password, user.passwordHash);
     if (!valid) throw new UnauthorizedException('Invalid credentials');
-    const token = await this.authService.generateJwt({ sub: user._id, username: user.username });
+    const token = await this.authService.generateJwt({ sub: String(user._id), username: user.username });
     return { access_token: token };
   }
 

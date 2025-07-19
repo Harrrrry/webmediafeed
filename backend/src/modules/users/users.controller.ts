@@ -1,5 +1,6 @@
-import { Controller, Post, Body, Get, Param } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Req, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 class RegisterDto {
   username: string;
@@ -24,6 +25,14 @@ export class UsersController {
   @Post('login')
   login(@Body() dto: LoginDto) {
     return this.usersService.login(dto.username, dto.password);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  getMe(@Req() req: any) {
+    // @ts-ignore
+    const userId = req.user.userId;
+    return this.usersService.getProfile(userId);
   }
 
   @Get(':id')

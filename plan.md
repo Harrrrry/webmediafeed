@@ -10,16 +10,16 @@
 - [x] Add styled-components for scoped and reusable styling
 
 ## Phase 2: Backend Setup (NestJS) & Database
-- [ ] Initialize NestJS backend project  
+- [x] Initialize NestJS backend project  
   - Use Nest CLI to scaffold project structure
-- [ ] Install and configure Mongoose for MongoDB integration
-- [ ] Set up environment variables for MongoDB connection (local or Atlas)
-- [ ] Design MongoDB schemas/models for:
+- [x] Install and configure Mongoose for MongoDB integration
+- [x] Set up environment variables for MongoDB connection (local or Atlas)
+- [x] Design MongoDB schemas/models for:
   - User
   - Post
   - Comment
   - (Optional) AI features (captions, tags, sentiment)
-- [ ] Implement Mongoose schemas in NestJS modules
+- [x] Implement Mongoose schemas in NestJS modules
 
 ## Phase 3: API Design & Implementation (NestJS)
 - [ ] Create RESTful API endpoints for core features:
@@ -44,30 +44,30 @@
     - POST `/ai/caption` — Generate caption for media
     - POST `/ai/face-detect` — Detect faces in media
     - POST `/ai/sentiment` — Analyze sentiment of comment
-- [ ] Implement authentication middleware (JWT or similar)
+- [x] Implement authentication middleware (JWT or similar)
 - [ ] Add validation and error handling for all endpoints
 
 ## Phase 4: Frontend Data Integration
-- [ ] Connect frontend to real backend APIs (NestJS)
-- [ ] Create Redux async thunks for fetching/creating posts, comments, likes, etc.
-- [ ] Dispatch thunks on load and user actions, store data in RTK state
-- [ ] Handle authentication (login/signup, token storage)
+- [x] Connect frontend to real backend APIs (NestJS)
+- [x] Create Redux async thunks for fetching/creating posts, comments, likes, etc.
+- [x] Dispatch thunks on load and user actions, store data in RTK state
+- [x] Handle authentication (login/signup, token storage)
 
 ## Phase 5: Post Feed UI
-- [ ] Create PostCard component (image/video)  
+- [x] Create PostCard component (image/video)  
   - Accept props for image/video URL, caption, likes, etc.
-- [ ] Create Feed container component  
+- [x] Create Feed container component  
   - Render list of PostCards using mapped data
-- [ ] Add infinite scroll pagination logic (using nextCursor param)
-- [ ] Add like/unlike interaction (integrated with backend)
+- [x] Add infinite scroll pagination logic (using nextCursor param)
+- [x] Add like/unlike interaction (integrated with backend)
 
 ## Phase 6: Media Upload
-- [ ] Create media upload UI  
+- [x] Create media upload UI  
   - Allow selecting image/video file from device
-- [ ] Handle image/video preview  
+- [x] Handle image/video preview  
   - Show selected file in preview area before upload
-- [ ] Integrate with backend media upload API (Cloudinary/Firebase)
-- [ ] Save post metadata (caption, media type, URL) via backend
+- [x] Integrate with backend media upload API (Cloudinary/Firebase)
+- [x] Save post metadata (caption, media type, URL) via backend
 
 ## Phase 7: AI Feature Integration (Optional)
 - [ ] Add AI-generated caption (optional UI toggle)  
@@ -76,22 +76,22 @@
   - Use backend or JS library for face detection
 
 ## Phase 8: Reusability & WebView
-- [ ] Make Feed a reusable component (props-driven)  
+- [x] Make Feed a reusable component (props-driven)  
   - Feed should accept `data`, `onLike`, `onScroll` handlers
-- [ ] Ensure mobile-first responsiveness  
+- [x] Ensure mobile-first responsiveness  
   - Test on mobile breakpoints, touch interactions
-- [ ] Test in WebView context on mobile  
+- [x] Test in WebView context on mobile  
   - Load web app in WebView shell and verify functionality
 
 ## Phase 9: Extras & Polish
-- [ ] Add animations (like button pop, scroll fade-in)  
+- [x] Add animations (like button pop, scroll fade-in)  
   - Use Framer Motion or CSS transitions
-- [ ] Add error/loading states  
+- [x] Add error/loading states  
   - Show skeleton or spinner for loading, friendly error messages
-- [ ] Optimize for performance (lazy load, code split)  
+- [x] Optimize for performance (lazy load, code split)  
   - Lazy load images/videos and split bundle
-- [ ] Add accessibility (a11y) checks and improvements
-- [ ] Add basic analytics/monitoring (optional)
+- [x] Add accessibility (a11y) checks and improvements
+- [x] Add basic analytics/monitoring (optional)
 
 ## Phase 10: Future Phase Planning
 - [ ] Comment system enhancements  
