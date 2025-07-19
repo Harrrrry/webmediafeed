@@ -7,6 +7,7 @@ import { Feed } from './pages/Feed';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BottomNav } from './components/BottomNav';
 
 function App() {
   const { token } = useSelector((state: RootState) => state.auth);
@@ -21,6 +22,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
         </Routes>
+        <BottomNav />
       </BrowserRouter>
     </>
   );

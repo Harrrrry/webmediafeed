@@ -4,26 +4,33 @@ import './index.css';
 import App from './App.tsx';
 import { Provider } from 'react-redux';
 import { store } from './app/store';
-import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
-import useMediaQuery from '@mui/material/useMediaQuery';
+import { ThemeProvider as MuiThemeProvider, createTheme, CssBaseline } from '@mui/material';
+import { ThemeProvider } from 'styled-components';
+import theme from './styles/theme';
 
 function Main() {
-  const prefersDark = useMediaQuery('(prefers-color-scheme: dark)');
-  const theme = createTheme({
+  // Optionally, you can sync MUI theme with your custom theme
+  const muiTheme = createTheme({
     palette: {
-      mode: prefersDark ? 'dark' : 'light',
-      primary: { main: '#2563eb' },
-      secondary: { main: '#e0245e' },
+      mode: 'light',
+      primary: { main: theme.colors.accent },
+      secondary: { main: theme.colors.success },
+      error: { main: theme.colors.error },
+      background: { default: '#fafafa' },
+      text: { primary: theme.colors.text, secondary: theme.colors.textSecondary },
     },
-    shape: { borderRadius: 12 },
+    shape: { borderRadius: 16 },
+    typography: { fontFamily: theme.fontFamily },
   });
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Provider store={store}>
-        <App />
-      </Provider>
-    </ThemeProvider>
+    <MuiThemeProvider theme={muiTheme}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Provider store={store}>
+          <App />
+        </Provider>
+      </ThemeProvider>
+    </MuiThemeProvider>
   );
 }
 

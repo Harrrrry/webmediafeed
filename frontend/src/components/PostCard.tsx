@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardMedia, Typography, Box, IconButton, Avatar, Stack, Collapse, Divider } from '@mui/material';
+import { useState, useEffect, useRef } from 'react';
+import { CardContent, Typography, Box, Avatar, Stack, Collapse, Divider, IconButton, Tooltip } from '@mui/material';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
@@ -9,29 +9,69 @@ import type { RootState } from '../app/store';
 import type { User } from '../utils/interfaces/user';
 import { fetchComments } from '../features/comments/commentsSlice';
 import type { UnknownAction } from '@reduxjs/toolkit';
+import { styled, useTheme, keyframes } from 'styled-components';
 
-interface PostCardProps {
-  id: string;
-  mediaUrl: string;
-  mediaType: 'image' | 'video';
-  caption: string;
-  likes: string[]; // Array of user IDs
-  onLike: () => void;
-  user: string;
-  timestamp: string;
-  commentCount?: number;
-  userObj: User | null;
-}
+const GlassCard = styled(Box)`
+  &.glass-card {
+    padding: ${({ theme }) => theme.spacing.md};
+    margin-bottom: ${({ theme }) => theme.spacing.md};
+    border-radius: ${({ theme }) => theme.radii.card};
+    box-shadow: ${({ theme }) => theme.shadows.card};
+    border: ${({ theme }) => theme.colors.cardBorder};
+    background: ${({ theme }) => theme.glass.background};
+    backdrop-filter: blur(${({ theme }) => theme.glass.blur});
+    -webkit-backdrop-filter: blur(${({ theme }) => theme.glass.blur});
+    transition: box-shadow 0.2s, background 0.2s, transform 0.15s;
+    &:hover {
+      box-shadow: 0 12px 32px 0 #a18cd1;
+      transform: translateY(-2px) scale(1.01);
+    }
+  }
+`;
 
-export const PostCard = ({ id, mediaUrl, mediaType, caption, likes, onLike, user, timestamp, userObj }: PostCardProps) => {
+const ActionIconButton = styled(IconButton)`
+  border-radius: 1.2rem;
+  background: transparent;
+  color: ${({ theme }) => theme.colors.accent};
+  transition: color 0.2s, transform 0.1s;
+  &:hover, &:focus {
+    background: transparent;
+    color: ${({ theme }) => theme.colors.accent};
+    box-shadow: none;
+  }
+  &:active {
+    background: transparent;
+    color: ${({ theme }) => theme.colors.accent};
+  }
+  &:focus {
+    outline: 2px solid ${({ theme }) => theme.colors.accent};
+    outline-offset: 2px;
+  }
+`;
+
+const heartPop = keyframes`
+  0% { transform: scale(1); }
+  30% { transform: scale(1.4); }
+  60% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+`;
+
+const AnimatedHeart = styled(FavoriteIcon)`
+  color: ${({ theme }) => theme.colors.error};
+  &.pop {
+    animation: ${heartPop} 0.5s cubic-bezier(.36,1.01,.32,1) forwards;
+  }
+`;
+
+export const PostCard = ({ id, mediaUrl, mediaType, caption, likes, onLike, user, timestamp, userObj }: any) => {
   const dispatch = useDispatch();
   const [animate, setAnimate] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const commentCount = useSelector((state: RootState) => (state.comments.commentsByPost[id]?.length || 0));
   const likeCount = Array.isArray(likes) ? likes.length : likes;
   const liked = Array.isArray(likes) && userObj ? likes.includes(userObj.id) : false;
-  // Debug output
-  console.log('DEBUG:', { id, likes, userId: userObj?.id, liked });
+  const theme = useTheme();
+  const heartRef = useRef<SVGSVGElement>(null);
 
   useEffect(() => {
     if (showComments) {
@@ -39,76 +79,77 @@ export const PostCard = ({ id, mediaUrl, mediaType, caption, likes, onLike, user
     }
   }, [showComments, dispatch, id]);
 
+  useEffect(() => {
+    if (animate && heartRef.current) {
+      const node = heartRef.current;
+      node.classList.add('pop');
+      const handleEnd = () => {
+        node.classList.remove('pop');
+        setAnimate(false);
+      };
+      node.addEventListener('animationend', handleEnd, { once: true });
+      return () => node.removeEventListener('animationend', handleEnd);
+    }
+  }, [animate]);
+
   const handleLike = () => {
     setAnimate(true);
     onLike();
-    setTimeout(() => setAnimate(false), 300);
   };
 
   return (
-    <Card sx={{ mb: 3, borderRadius: 3, boxShadow: 3, maxWidth: 500, mx: 'auto' }}>
-      {/* Header: Avatar, Username, Timestamp */}
-      <Box display="flex" alignItems="center" px={2} pt={2} pb={1}>
-        <Avatar sx={{ bgcolor: 'primary.main', width: 36, height: 36, mr: 2 }}>
-          {user?.[0]?.toUpperCase() || 'U'}
-        </Avatar>
-        <Box flex={1}>
-          <Typography variant="subtitle2" fontWeight={600}>{user}</Typography>
-          <Typography variant="caption" color="text.secondary">
-            {new Date(timestamp).toLocaleString()}
-          </Typography>
-        </Box>
-      </Box>
-      {/* Media */}
-      {mediaType === 'image' ? (
-        <CardMedia
-          component="img"
-          image={mediaUrl}
-          alt={caption}
-          sx={{ width: '100%', maxHeight: 500, objectFit: 'cover', borderRadius: 0 }}
-        />
-      ) : (
-        <CardMedia
-          component="video"
-          src={mediaUrl}
-          controls
-          sx={{ width: '100%', maxHeight: 500, objectFit: 'cover', borderRadius: 0 }}
-        />
-      )}
-      {/* Actions: Like, Comment, Likes count */}
-      <CardContent sx={{ pt: 1, pb: 1 }}>
-        <Stack direction="row" alignItems="center" spacing={1}>
-          <IconButton
-            onClick={handleLike}
-            aria-label="Like post"
-            sx={{
-              color: liked ? 'error.main' : 'inherit',
-              transform: animate ? 'scale(1.3)' : 'scale(1)',
-              transition: 'transform 0.2s, color 0.2s',
-            }}
-          >
-            {liked ? <FavoriteIcon /> : <FavoriteBorderIcon />}
-          </IconButton>
+    <GlassCard className="glass-card" sx={{ maxWidth: 500, mx: 'auto', p: { xs: 2, sm: 3 }, mb: { xs: 3, sm: 4 }, boxShadow: theme.shadows.card, borderRadius: theme.radii.card }}>
+      <CardContent sx={{ p: 0 }}>
+        {/* Header: Avatar, Username, Timestamp */}
+        <Stack direction="row" alignItems="center" spacing={2} mb={1}>
+          <Avatar sx={{ bgcolor: theme.colors.accent, width: 40, height: 40, fontWeight: 700 }}>{user?.[0]?.toUpperCase() || 'U'}</Avatar>
+          <Box flex={1}>
+            <Typography variant="subtitle2" fontWeight={700} color={theme.colors.text}>{user}</Typography>
+            <Typography variant="caption" color={theme.colors.textSecondary}>
+              {new Date(timestamp).toLocaleString()}
+            </Typography>
+          </Box>
+        </Stack>
+        {/* Media */}
+        {mediaType === 'image' ? (
+          <Box mb={2} mt={1}>
+            <img src={mediaUrl} alt={caption} style={{ width: '100%', maxHeight: 400, objectFit: 'cover', borderRadius: theme.radii.card, boxShadow: theme.shadows.card }} />
+          </Box>
+        ) : (
+          <Box mb={2} mt={1}>
+            <video src={mediaUrl} controls style={{ width: '100%', maxHeight: 400, borderRadius: theme.radii.card, boxShadow: theme.shadows.card }} />
+          </Box>
+        )}
+        {/* Actions: Like, Comment, Likes count */}
+        <Stack direction="row" alignItems="center" spacing={1} mb={1}>
+          <Tooltip title={liked ? 'Unlike' : 'Like'}>
+            <ActionIconButton
+              onClick={handleLike}
+              aria-label={liked ? 'Unlike post' : 'Like post'}
+              tabIndex={0}
+            >
+              {liked ? <FavoriteIcon color="error" /> : <FavoriteBorderIcon />}
+            </ActionIconButton>
+          </Tooltip>
           <Typography variant="body2" fontWeight={600}>{likeCount}</Typography>
-          <IconButton
-            onClick={() => setShowComments((v) => !v)}
-            aria-label="Show comments"
-            sx={{ ml: 1 }}
-          >
-            <ChatBubbleOutlineIcon />
-          </IconButton>
+          <Tooltip title="Show comments">
+            <ActionIconButton
+              onClick={() => setShowComments((v) => !v)}
+              aria-label="Show comments"
+              tabIndex={0}
+              sx={{ ml: 1 }}
+            >
+              <ChatBubbleOutlineIcon />
+            </ActionIconButton>
+          </Tooltip>
           <Typography variant="body2">{commentCount}</Typography>
         </Stack>
-        <Typography variant="body1" sx={{ mt: 1 }}>{caption}</Typography>
-        {/* Debug output visible in UI */}
-        <Typography variant="caption" color="secondary">
-          Debug: userId={userObj?.id} | likes={JSON.stringify(likes)} | liked={String(liked)}
-        </Typography>
+        <Typography variant="body1" sx={{ mt: 1, mb: 1, color: theme.colors.text }}>{caption}</Typography>
         <Collapse in={showComments} timeout="auto" unmountOnExit>
           <Divider sx={{ my: 2 }} />
           <Comments postId={id} />
         </Collapse>
       </CardContent>
-    </Card>
+    </GlassCard>
   );
 }; 
