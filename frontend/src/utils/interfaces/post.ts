@@ -6,6 +6,7 @@ export interface Post {
   likes: string[];
   user: string;
   timestamp: string;
+  commentCount: number;
 }
 
 export interface CreatePostRequest {

@@ -55,7 +55,7 @@ const commentsSlice = createSlice({
       })
       .addCase(addComment.fulfilled, (state, action) => {
         const { postId, comment } = action.payload;
-        if (!state.commentsByPost[postId]) state.commentsByPost[postId] = [];
+        if (!state.commentsByPost[postId]) {state.commentsByPost[postId] = [];}
         state.commentsByPost[postId].push(comment);
       })
       .addCase(deleteComment.fulfilled, (state, action) => {

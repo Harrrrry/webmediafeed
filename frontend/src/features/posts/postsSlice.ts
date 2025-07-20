@@ -7,18 +7,26 @@ interface PostsState {
   posts: Post[];
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
+  hasMore: boolean;
 }
 
 const initialState: PostsState = {
   posts: [],
   status: 'idle',
   error: null,
+  hasMore: true,
 };
 
 export const fetchPosts = createAsyncThunk('posts/fetchPosts', async (page: number = 1) => {
   const posts = await api.getPosts(page);
-  // Map _id to id for each post
-  return posts.map((p: any) => ({ ...p, id: p._id || p.id, user: p.userId || p.user, timestamp: p.createdAt || p.timestamp }));
+  // Map _id to id for each post, include commentCount and user data
+  return posts.map((p: any) => ({ 
+    ...p, 
+    id: p._id || p.id, 
+    user: p.user || p.userId || 'Unknown User', 
+    timestamp: p.createdAt || p.timestamp, 
+    commentCount: p.commentCount ?? 0 
+  }));
 });
 
 export const createPost = createAsyncThunk('posts/createPost', async (data: { mediaUrl: string; mediaType: string; caption?: string }) => {
@@ -62,6 +70,8 @@ const postsSlice = createSlice({
         } else {
           state.posts = [...state.posts, ...action.payload];
         }
+        // Set hasMore to false if fewer than 10 posts returned
+        state.hasMore = action.payload.length === 10;
       })
       .addCase(fetchPosts.rejected, (state, action) => {
         state.status = 'failed';
@@ -73,7 +83,7 @@ const postsSlice = createSlice({
       .addCase(likePost.fulfilled, (state, action) => {
         const updated = action.payload;
         const idx = state.posts.findIndex((p) => p.id === updated.id);
-        if (idx !== -1) state.posts[idx] = updated;
+        if (idx !== -1) {state.posts[idx] = updated;}
       });
   },
 });

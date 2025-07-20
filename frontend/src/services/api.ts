@@ -8,7 +8,7 @@ async function request(path: string, options: RequestInit = {}) {
     ...options.headers,
   };
   const res = await fetch(`${API_URL}${path}`, { ...options, headers });
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) {throw new Error(await res.text());}
   return res.json();
 }
 

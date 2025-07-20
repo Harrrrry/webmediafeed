@@ -14,7 +14,7 @@ export const Register = () => {
   const [password, setPassword] = useState('');
 
   useEffect(() => {
-    if (token) navigate('/');
+    if (token) {navigate('/');}
   }, [token, navigate]);
 
   const handleSubmit = (e: React.FormEvent) => {

@@ -1,10 +1,11 @@
+import React from 'react';
 import { Box, IconButton, Tooltip } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
 import SearchIcon from '@mui/icons-material/Search';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import { styled, useTheme } from 'styled-components';
+import { styled } from 'styled-components';
 
 const NavBar = styled(Box)`
   position: fixed;
@@ -52,8 +53,7 @@ const GlowIconButton = styled(IconButton)`
   }
 `;
 
-export const BottomNav = () => {
-  const theme = useTheme();
+export const BottomNav = (): React.ReactElement => {
   return (
     <NavBar className="glass-card" role="navigation" aria-label="Bottom navigation">
       <Tooltip title="Home" arrow><GlowIconButton aria-label="Home" tabIndex={0}><HomeIcon fontSize="inherit" /></GlowIconButton></Tooltip>
