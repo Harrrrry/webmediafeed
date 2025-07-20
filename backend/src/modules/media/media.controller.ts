@@ -16,7 +16,7 @@ export class MediaController {
     }),
   }))
   uploadFile(@UploadedFile() file: Express.Multer.File) {
-    // Return the local file URL (in production, use Cloudinary/Firebase)
+    // Return the local file URL
     return { url: `/uploads/${file.filename}` };
   }
 }

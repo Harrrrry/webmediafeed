@@ -23,4 +23,8 @@ export class CommentsService {
     await comment.deleteOne();
     return { deleted: true };
   }
+
+  async countByPost(postId: string): Promise<number> {
+    return this.commentModel.countDocuments({ postId });
+  }
 } 

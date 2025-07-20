@@ -1,11 +1,17 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException, Inject, forwardRef } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Post, PostDocument } from './post.schema';
+import { CommentsService } from '../comments/comments.service';
+import { User, UserDocument } from '../users/user.schema';
 
 @Injectable()
 export class PostsService {
-  constructor(@InjectModel(Post.name) private postModel: Model<PostDocument>) {}
+  constructor(
+    @InjectModel(Post.name) private postModel: Model<PostDocument>,
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
+    @Inject(forwardRef(() => CommentsService)) private commentsService: CommentsService,
+  ) {}
 
   async findAll(page = 1, limit = 10) {
     const posts = await this.postModel
@@ -13,7 +19,19 @@ export class PostsService {
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit);
-    return posts;
+    // For each post, get commentCount and user data
+    const postsWithCounts = await Promise.all(
+      posts.map(async (post) => {
+        const commentCount = await this.commentsService.countByPost(String(post._id));
+        const user = await this.userModel.findById(post.userId);
+        return { 
+          ...post.toObject(), 
+          commentCount,
+          user: user?.username || 'Unknown User'
+        };
+      })
+    );
+    return postsWithCounts;
   }
 
   async findOne(id: string) {
