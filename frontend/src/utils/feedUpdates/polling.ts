@@ -4,13 +4,14 @@ let intervalId: ReturnType<typeof setInterval> | null = null;
 let bannerVisible = false;
 let lastSeenPostId: string | null = null;
 
-export function subscribeToFeedUpdates(getFeedPostIds: () => string[], onNewPosts: () => void, interval = 10000) {
+export function subscribeToFeedUpdates(getFeedPostIds: () => string[], onNewPosts: () => void, interval = 10000, shaadiId?: string) {
   if (intervalId) {return;}
   lastSeenPostId = getFeedPostIds()[0] || null;
   intervalId = setInterval(async () => {
     if (bannerVisible) {return;}
+    if (!shaadiId) {return;}
     const feedPostIds = new Set(getFeedPostIds());
-    const posts = await api.getPosts(1);
+    const posts = await api.getPosts(shaadiId, 1);
     const latestId = posts.length ? (posts[0].id || posts[0]._id) : null;
     // Debug logs
     console.log('[Polling] Feed post IDs:', Array.from(feedPostIds));

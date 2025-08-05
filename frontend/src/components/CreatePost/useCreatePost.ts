@@ -1,12 +1,14 @@
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useState, useRef } from 'react';
 import { createPost } from '../../features/posts/postsSlice';
+import type { RootState } from '../../app/store';
 import axios from 'axios';
 
 export const useCreatePost = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { currentShaadi } = useSelector((state: RootState) => state.shaadi);
   const [media, setMedia] = useState<File | null>(null);
   const [mediaUrl, setMediaUrl] = useState('');
   const [mediaType, setMediaType] = useState<'image' | 'video' | ''>('');
@@ -30,7 +32,10 @@ export const useCreatePost = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!media) {return;}
+    if (!media || !currentShaadi?._id) {
+      setUploadError(!currentShaadi?._id ? 'Please select a Shaadi first' : 'Please select media to upload');
+      return;
+    }
     const formData = new FormData();
     formData.append('file', media);
     formData.append('caption', caption);
@@ -47,7 +52,12 @@ export const useCreatePost = () => {
         },
       });
       const { url } = res.data;
-      dispatch(createPost({ mediaUrl: url, mediaType, caption }) as any);
+      dispatch(createPost({ 
+        shaadiId: currentShaadi._id,
+        mediaUrls: [url], 
+        mediaTypes: [mediaType], 
+        caption 
+      }) as any);
       navigate('/');
     } catch (err) {
       setUploadError('Upload failed');
@@ -63,6 +73,6 @@ export const useCreatePost = () => {
 
   return {
     media, mediaUrl, mediaType, caption, inputRef, uploading, uploadProgress, uploadError,
-    setCaption, handleFileChange, handleUploadClick, handleSubmit, handleBack
+    currentShaadi, setCaption, handleFileChange, handleUploadClick, handleSubmit, handleBack
   };
 }; 

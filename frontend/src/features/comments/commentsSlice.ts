@@ -15,21 +15,22 @@ const initialState: CommentsState = {
   errorByPost: {},
 };
 
-export const fetchComments = createAsyncThunk('comments/fetchComments', async (postId: string) => {
-  const comments = await api.getComments(postId);
+export const fetchComments = createAsyncThunk('comments/fetchComments', async (data: { postId: string; shaadiId: string }) => {
+  const { postId, shaadiId } = data;
+  const comments = await api.getComments(postId, shaadiId);
   // Map _id to id for each comment
   return { postId, comments: comments.map((c: any) => ({ ...c, id: c._id || c.id })) };
 });
 
-export const addComment = createAsyncThunk('comments/addComment', async ({ postId, text }: { postId: string; text: string }) => {
-  const comment = await api.addComment(postId, text);
-  // Map _id to id for the new comment
+export const addComment = createAsyncThunk('comments/addComment', async (data: { postId: string; shaadiId: string; text: string }) => {
+  const { postId, shaadiId, text } = data;
+  const comment = await api.addComment(postId, shaadiId, text);
   return { postId, comment: { ...comment, id: comment._id || comment.id } };
 });
 
-export const deleteComment = createAsyncThunk('comments/deleteComment', async ({ postId, id }: { postId: string; id: string }) => {
-  await api.deleteComment(id);
-  return { postId, id };
+export const deleteComment = createAsyncThunk('comments/deleteComment', async (data: { id: string; postId: string }) => {
+  await api.deleteComment(data.id);
+  return { id: data.id, postId: data.postId };
 });
 
 const commentsSlice = createSlice({
@@ -39,7 +40,7 @@ const commentsSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchComments.pending, (state, action) => {
-        const postId = action.meta.arg;
+        const postId = action.meta.arg.postId;
         state.statusByPost[postId] = 'loading';
         state.errorByPost[postId] = null;
       })
@@ -49,7 +50,7 @@ const commentsSlice = createSlice({
         state.commentsByPost[postId] = comments;
       })
       .addCase(fetchComments.rejected, (state, action) => {
-        const postId = action.meta.arg;
+        const postId = action.meta.arg.postId;
         state.statusByPost[postId] = 'failed';
         state.errorByPost[postId] = action.error.message || 'Failed to fetch comments';
       })

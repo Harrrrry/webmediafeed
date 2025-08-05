@@ -15,4 +15,14 @@ export function formatDate(date: string | number | Date, pattern = 'PPpp') {
  */
 export function formatRelative(date: string | number | Date) {
   return formatDistanceToNow(new Date(date), { addSuffix: true });
+}
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+export function getImageUrl(url: string) {
+  if (!url) return '';
+  if (url.startsWith('/uploads')) {
+    return API_URL + url;
+  }
+  return url;
 } 

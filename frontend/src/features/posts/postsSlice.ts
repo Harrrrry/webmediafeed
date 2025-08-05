@@ -17,8 +17,9 @@ const initialState: PostsState = {
   hasMore: true,
 };
 
-export const fetchPosts = createAsyncThunk('posts/fetchPosts', async (page: number = 1) => {
-  const posts = await api.getPosts(page);
+export const fetchPosts = createAsyncThunk('posts/fetchPosts', async (data: { shaadiId: string; page?: number }) => {
+  const { shaadiId, page = 1 } = data;
+  const posts = await api.getPosts(shaadiId, page);
   // Map _id to id for each post, include commentCount and user data
   return posts.map((p: any) => ({ 
     ...p, 
@@ -29,13 +30,13 @@ export const fetchPosts = createAsyncThunk('posts/fetchPosts', async (page: numb
   }));
 });
 
-export const createPost = createAsyncThunk('posts/createPost', async (data: { mediaUrl: string; mediaType: string; caption?: string }) => {
+export const createPost = createAsyncThunk('posts/createPost', async (data: CreatePostRequest & { shaadiId: string }) => {
   const post = await api.createPost(data);
   return { ...post, id: post._id || post.id, user: post.userId || post.user, timestamp: post.createdAt || post.timestamp };
 });
 
-export const likePost = createAsyncThunk('posts/likePost', async (id: string) => {
-  const post = await api.likePost(id);
+export const likePost = createAsyncThunk('posts/likePost', async (data: { id: string; shaadiId: string }) => {
+  const post = await api.likePost(data.id, data.shaadiId);
   return { ...post, id: post._id || post.id, user: post.userId || post.user, timestamp: post.createdAt || post.timestamp };
 });
 
@@ -55,6 +56,11 @@ const postsSlice = createSlice({
     setError(state, action: PayloadAction<string | null>) {
       state.error = action.payload;
     },
+    clearPosts(state) {
+      state.posts = [];
+      state.status = 'idle';
+      state.hasMore = true;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -65,7 +71,8 @@ const postsSlice = createSlice({
       .addCase(fetchPosts.fulfilled, (state, action) => {
         state.status = 'succeeded';
         // If page is 1, replace; otherwise, append
-        if (action.meta.arg === 1) {
+        const page = action.meta.arg.page || 1;
+        if (page === 1) {
           state.posts = action.payload;
         } else {
           state.posts = [...state.posts, ...action.payload];
@@ -88,5 +95,5 @@ const postsSlice = createSlice({
   },
 });
 
-export const { setPosts, addPost, setStatus, setError } = postsSlice.actions;
+export const { setPosts, addPost, setStatus, setError, clearPosts } = postsSlice.actions;
 export default postsSlice.reducer; 

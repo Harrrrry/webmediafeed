@@ -8,7 +8,8 @@ declare module 'styled-components' {
 }
 
 const fontUrl = 'https://fonts.googleapis.com/css?family=Inter:400,500,600,700&display=swap';
-const fontFace = `@import url('${fontUrl}');`;
+const dancingScriptUrl = 'https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;600;700&display=swap';
+const fontFace = `@import url('${fontUrl}'); @import url('${dancingScriptUrl}');`;
 
 const GlobalStyle = createGlobalStyle`
   ${fontFace}
@@ -45,7 +46,36 @@ const GlobalStyle = createGlobalStyle`
     backdrop-filter: blur(${({ theme }) => theme.glass.blur});
     -webkit-backdrop-filter: blur(${({ theme }) => theme.glass.blur});
     padding: ${({ theme }) => theme.spacing.md};
-    transition: box-shadow 0.2s, background 0.2s;
+    margin: ${({ theme }) => theme.spacing.sm} 0;
+  }
+  /* Input, Select, Textarea Global Styles */
+  input, select, textarea {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 12px;
+    padding: 12px 16px;
+    color: #fff;
+    font-weight: 500;
+    font-family: inherit;
+    font-size: 1rem;
+    transition: border 0.2s, box-shadow 0.2s;
+    outline: none;
+    box-shadow: none;
+    margin-bottom: 0.5rem;
+  }
+  input::placeholder, textarea::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+    opacity: 1;
+    font-weight: 400;
+  }
+  input:focus, select:focus, textarea:focus {
+    /* No custom focus style */
+  }
+  /* Remove autofill background for Chrome */
+  input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 1000px rgba(255,255,255,0.1) inset !important;
+    -webkit-text-fill-color: #fff !important;
+    transition: background-color 5000s ease-in-out 0s;
   }
   /* Responsive breakpoints */
   @media (max-width: 600px) {

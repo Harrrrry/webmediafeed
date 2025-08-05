@@ -2,14 +2,12 @@ import { styled } from 'styled-components';
 import { AppBar, Typography, Button, Avatar, IconButton, Menu, MenuItem, Divider, Drawer, List, ListItem, ListItemIcon, ListItemText, Box, Badge } from '@mui/material';
 
 export const WeddingAppBar = styled(AppBar)`
-  background: ${({ theme }) => theme.glass.background} !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
+  background: #fff !important;
   border-bottom: 1px solid ${({ theme }) => theme.glass.border} !important;
   box-shadow: ${({ theme }) => theme.shadows.card} !important;
-  position: fixed !important;
+  position: sticky !important;
   top: 0;
-  z-index: 1200;
+  z-index: 1202;
   &::before {
     content: '';
     position: absolute;

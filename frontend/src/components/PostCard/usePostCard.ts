@@ -1,18 +1,13 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { fetchComments } from '../../features/comments/commentsSlice';
+import type { RootState } from '../../app/store';
 import type { UnknownAction } from '@reduxjs/toolkit';
-
-interface UsePostCardProps {
-  id: string;
-  likes: string[] | number;
-  userObj: any;
-  commentCount: number;
-  onLike: () => void;
-}
+import type { UsePostCardProps } from '../../utils/interfaces/post';
 
 export const usePostCard = ({ id, likes, userObj, commentCount, onLike }: UsePostCardProps) => {
   const dispatch = useDispatch();
+  const { currentShaadi } = useSelector((state: RootState) => state.shaadi);
   const [animate, setAnimate] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const heartRef = useRef<SVGSVGElement>(null);
@@ -30,10 +25,10 @@ export const usePostCard = ({ id, likes, userObj, commentCount, onLike }: UsePos
   }, []);
 
   useEffect(() => {
-    if (showComments && commentCount > 0) {
-      dispatch(fetchComments(id) as unknown as UnknownAction);
+    if (showComments && commentCount > 0 && currentShaadi?._id) {
+      dispatch(fetchComments({ postId: id, shaadiId: currentShaadi._id }) as unknown as UnknownAction);
     }
-  }, [showComments, commentCount, dispatch, id]);
+  }, [showComments, commentCount, dispatch, id, currentShaadi?._id]);
 
   useEffect(() => {
     if (animate && heartRef.current) {

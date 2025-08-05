@@ -1,7 +1,7 @@
 import { styled } from 'styled-components';
 import { Box, IconButton, Typography } from '@mui/material';
 
-export const CompactCreatePost = styled(Box)`
+export const CompactCreatePostContainer = styled(Box)`
   background: ${({ theme }) => theme.glass.background};
   border: 1px solid ${({ theme }) => theme.colors.cardBorder};
   border-radius: ${({ theme }) => theme.radii.card};

@@ -1,24 +1,57 @@
+import React, { useState } from 'react';
+import { 
+  AppBar, 
+  Toolbar, 
+  IconButton, 
+  Menu, 
+  MenuItem, 
+  Typography, 
+  Box,
+  Tooltip,
+  Badge,
+  Drawer,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  useMediaQuery,
+  useTheme as useMuiTheme,
+  Divider,
+  Button
+} from '@mui/material';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../../app/store';
-import { Link } from 'react-router-dom';
-import { AppBar, Toolbar, Typography, Button, Avatar, Box, IconButton, Tooltip, Badge, Menu, MenuItem, Divider, Drawer, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
-import HomeIcon from '@mui/icons-material/Home';
-import SearchIcon from '@mui/icons-material/Search';
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import LogoutIcon from '@mui/icons-material/Logout';
-import SettingsIcon from '@mui/icons-material/Settings';
-import HelpIcon from '@mui/icons-material/Help';
 import MenuIcon from '@mui/icons-material/Menu';
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import HomeIcon from '@mui/icons-material/Home';
+import PersonIcon from '@mui/icons-material/Person';
+import SettingsIcon from '@mui/icons-material/Settings';
+import LogoutIcon from '@mui/icons-material/Logout';
+import styled from '@emotion/styled';
+import { theme } from '../../styles/theme';
+import ShaadiSwitcher from '../ShaadiSwitcher';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import HelpIcon from '@mui/icons-material/Help';
 import CloseIcon from '@mui/icons-material/Close';
 import { useTheme } from 'styled-components';
 import { useUserMenu } from './useUserMenu';
 import { WeddingAppBar, LogoText, GlowIconButton, NotificationBadge, WeddingDrawer, DrawerHeader, DrawerMenuItem, DecorativePattern } from './UserMenu.styled';
+import UserAvatar from '../common/UserAvatar';
+import { UserRole } from '../../utils/constants';
 
 const UserMenu = () => {
   const theme = useTheme();
   const { user, token } = useSelector((state: RootState) => state.auth);
+  const { userShaadis, status } = useSelector((state: RootState) => state.shaadi);
   const { drawerOpen, handleDrawerToggle, handleLogout } = useUserMenu();
+  const location = useLocation();
+  const navigate = useNavigate();
+  
+  // Check if user has any Shaadis (is member/creator of any)
+  // Only show Shaadi switcher if data is loaded and user has Shaadis
+  const hasUserShaadis = status === 'succeeded' && userShaadis && userShaadis.length > 0;
 
   const menuItems = [
     { text: 'Profile', icon: <AccountCircleIcon />, action: handleDrawerToggle },
@@ -30,22 +63,45 @@ const UserMenu = () => {
   return (
     <>
       <WeddingAppBar position="static" elevation={0}>
-        <Toolbar sx={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center',
+        <Toolbar sx={{
           minHeight: '4rem',
-          px: { xs: 2, sm: 3 }
+          maxWidth: 768,
+          width: '100%',
+          margin: '0 auto',
+          px: 2,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          gap: 2,
         }}>
-          {/* Left: App Name */}
-          <Link to="/" style={{ textDecoration: 'none' }}>
-            <LogoText variant="h6">
-              ShaadiFeed
-            </LogoText>
-          </Link>
-
+          {/* Left: App name or Back button */}
+          <Box display="flex" alignItems="center" sx={{ minWidth: 'fit-content', width: '140px', flexShrink: 0 }}>
+            {location.pathname === '/create-post' ? (
+              <IconButton onClick={() => navigate(-1)} sx={{ color: theme.colors.text }}>
+                <ArrowBackIcon />
+              </IconButton>
+            ) : (
+              <Typography
+                variant="h6"
+                sx={{
+                  fontWeight: 700,
+                  color: theme.colors.accent,
+                  fontSize: '1.1rem',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                Shaadi Circle
+              </Typography>
+            )}
+          </Box>
+          
+          {/* Center: Shaadi Switcher (only show if user has Shaadis) */}
+          <Box display="flex" alignItems="center" justifyContent="center" flex={1} sx={{ minWidth: 0 }}>
+            {hasUserShaadis && <ShaadiSwitcher />}
+          </Box>
+          
           {/* Right: Notifications and Menu */}
-          <Box display="flex" alignItems="center" gap={1}>
+          <Box display="flex" alignItems="center" gap={1} sx={{ minWidth: 'fit-content', flexShrink: 0 }}>
             <Tooltip title="Notifications" arrow>
               <GlowIconButton size="small" sx={{ position: 'relative' }}>
                 <NotificationBadge 
@@ -79,7 +135,7 @@ const UserMenu = () => {
         <DrawerHeader>
           <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
             <LogoText variant="h6" sx={{ color: 'white', '&::after': { display: 'none' } }}>
-              ShaadiFeed
+              Shaadi Circle
             </LogoText>
             <GlowIconButton onClick={handleDrawerToggle} size="small" sx={{ color: 'white !important' }}>
               <CloseIcon fontSize="small" />
@@ -87,27 +143,7 @@ const UserMenu = () => {
           </Box>
           {token && user && (
             <Box display="flex" alignItems="center" gap={2}>
-              <Avatar 
-                sx={{ 
-                  bgcolor: 'white', 
-                  color: theme.colors.accent,
-                  width: 48, 
-                  height: 48, 
-                  fontSize: '1.2rem',
-                  fontWeight: 700,
-                  border: `2px solid ${theme.glass.border}`
-                }}
-              >
-                {user?.profilePicUrl ? (
-                  <img 
-                    src={user.profilePicUrl} 
-                    alt={user.username || 'User'} 
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                  />
-                ) : (
-                  user?.username?.[0]?.toUpperCase() || 'U'
-                )}
-              </Avatar>
+              <UserAvatar profilePicUrl={user?.profilePicUrl} username={user?.username} size={48} sx={{ bgcolor: 'white', color: theme.colors.accent, border: `2px solid ${theme.glass.border}` }} />
               <Box>
                 <Typography variant="subtitle1" sx={{ color: 'white', fontWeight: 700 }}>
                   {user?.username || 'User'}
@@ -150,7 +186,7 @@ const UserMenu = () => {
                 }
               }}
             >
-              Login to ShaadiFeed
+              Login to Shaadi Circle
             </Button>
           </Box>
         )}

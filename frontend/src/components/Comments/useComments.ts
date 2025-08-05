@@ -5,6 +5,7 @@ import type { RootState } from '../../app/store';
 
 export const useComments = (postId: string) => {
   const dispatch = useDispatch();
+  const { currentShaadi } = useSelector((state: RootState) => state.shaadi);
   const comments = useSelector((state: RootState) => state.comments.commentsByPost[postId] || []);
   const status = useSelector((state: RootState) => state.comments.statusByPost[postId] || 'idle');
   const error = useSelector((state: RootState) => state.comments.errorByPost[postId] || null);
@@ -12,8 +13,8 @@ export const useComments = (postId: string) => {
 
   const handleAdd = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!text.trim()) {return;}
-    dispatch(addComment({ postId, text }) as any);
+    if (!text.trim() || !currentShaadi?._id) {return;}
+    dispatch(addComment({ postId, shaadiId: currentShaadi._id, text }) as any);
     setText('');
   };
 

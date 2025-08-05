@@ -1,0 +1,26 @@
+import { Button } from '@mui/material';
+import { styled } from '@mui/material/styles';
+
+export const RegularLoginForm = styled('form')({
+  width: '100%',
+});
+
+export const RegularLoginButton = styled(Button)({
+  marginTop: '16px',
+  marginBottom: '8px',
+});
+
+export const RegularLoginLink = styled(Button)({
+  color: '#1976d2',
+  textDecoration: 'none',
+  fontWeight: 400,
+  fontSize: 'inherit',
+  textTransform: 'none',
+  minWidth: 'auto',
+  padding: 0,
+  '&:hover': {
+    color: '#1565c0',
+    backgroundColor: 'transparent',
+    textDecoration: 'none',
+  },
+}); 

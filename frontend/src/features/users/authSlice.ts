@@ -1,7 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { api } from '../../services/api';
-import type { User, UserLoginRequest, UserLoginResponse, UserProfileResponse } from '../../utils/interfaces/user';
+import type { User, UserLoginRequest, UserLoginResponse, UserProfileResponse, UserRegisterRequest } from '../../utils/interfaces/user';
+import { clearAllShaadiData } from '../shaadi/shaadiSlice';
 
 interface AuthState {
   user: User | null;
@@ -23,14 +24,42 @@ export const login = createAsyncThunk('auth/login', async (data: { username: str
   return res.access_token;
 });
 
-export const register = createAsyncThunk('auth/register', async (data: { username: string; email: string; password: string }) => {
-  return await api.register(data);
+export const register = createAsyncThunk('auth/register', async (data: UserRegisterRequest, { rejectWithValue }) => {
+  try {
+    return await api.register(data);
+  } catch (err: any) {
+    return rejectWithValue(err.message);
+  }
 });
 
 export const getProfile = createAsyncThunk<User, string>('auth/getProfile', async (id: string) => {
   const user = await api.getProfile(id);
   return { ...user, id: user._id || user.id };
 });
+
+export const loginWithShaadiCode = createAsyncThunk(
+  'auth/loginWithShaadiCode', 
+  async (code: string, { rejectWithValue }) => {
+    try {
+      const result = await api.loginWithShaadiCode(code);
+      
+      localStorage.setItem('token', result.access_token);
+      
+      return {
+        token: result.access_token,
+        user: result.user,
+        shaadi: result.shaadi,
+        role: result.role,
+        isInviteCode: result.isInviteCode,
+        isJoined: result.isJoined,
+        inviteId: result.inviteId
+      };
+    } catch (error: any) {
+      console.error('AuthSlice: loginWithShaadiCode error:', error);
+      return rejectWithValue(error.message || 'Login failed');
+    }
+  }
+);
 
 export const getProfileMe = createAsyncThunk<User>('auth/getProfileMe', async () => {
   const user = await api.getProfileMe();
@@ -56,6 +85,7 @@ const authSlice = createSlice({
       .addCase(login.fulfilled, (state, action) => {
         state.status = 'succeeded';
         state.token = action.payload;
+        state.user = null; // Will be set by getProfileMe
       })
       .addCase(login.rejected, (state, action) => {
         state.status = 'failed';
@@ -77,6 +107,19 @@ const authSlice = createSlice({
       })
       .addCase(getProfileMe.fulfilled, (state, action) => {
         state.user = action.payload;
+      })
+      .addCase(loginWithShaadiCode.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
+      })
+      .addCase(loginWithShaadiCode.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.token = action.payload.token;
+        state.user = action.payload.user;
+      })
+      .addCase(loginWithShaadiCode.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message || 'Invalid code or access denied';
       });
   },
 });
