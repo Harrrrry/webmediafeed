@@ -1,0 +1,57 @@
+version: '3.8'
+
+# Production services
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: webmediafeed_mongodb_prod
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_INITDB_DATABASE: webmediafeed
+    volumes:
+      - mongodb_prod_data:/data/db
+    networks:
+      - webmediafeed_network_prod
+    restart: always
+
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    container_name: webmediafeed_backend_prod
+    environment:
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://${MONGO_USER}:${MONGO_PASSWORD}@mongodb:27017/webmediafeed?authSource=admin
+      - JWT_SECRET=${JWT_SECRET}
+      - FRONTEND_URL=${FRONTEND_URL}
+    volumes:
+      - ./uploads:/usr/src/app/uploads
+    depends_on:
+      - mongodb
+    networks:
+      - webmediafeed_network_prod
+    restart: always
+
+  nginx:
+    image: nginx:alpine
+    container_name: webmediafeed_nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./frontend/dist:/usr/share/nginx/html
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/ssl:/etc/nginx/ssl
+    depends_on:
+      - backend
+    networks:
+      - webmediafeed_network_prod
+    restart: always
+
+networks:
+  webmediafeed_network_prod:
+    driver: bridge
+
+volumes:
+  mongodb_prod_data:

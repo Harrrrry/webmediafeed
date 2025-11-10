@@ -66,7 +66,7 @@ export const Login = ({ mode = 'login', prefilledCode, showTabs = true }: LoginP
   }, [mode, searchParams, prefilledCode]);
 
   React.useEffect(() => {
-    if (token && !user) {
+    if (token && !user) { //should use dispatch hook
       dispatch(getProfileMe() as unknown as UnknownAction);
     }
     if (token && user) {

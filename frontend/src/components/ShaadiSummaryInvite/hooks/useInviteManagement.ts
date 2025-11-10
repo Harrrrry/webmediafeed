@@ -31,23 +31,27 @@ export const useInviteManagement = (shaadiId: string) => {
 
   const deleteInvite = async (inviteId: string) => {
     try {
-      await api.deleteInvite(inviteId);
+      const response = await api.deleteInvite(shaadiId, inviteId);
       setDeleteInviteDialogOpen(false);
       setSelectedInvite(null);
       await loadInvites(); // Refresh the list
-      return { success: true, message: 'Invitation deleted successfully!' };
+      return { success: true, message: response?.message || 'Invitation deleted successfully!' };
     } catch (err: any) {
-      throw new Error(err.message || 'Failed to delete invitation');
+      console.error('Delete invite error:', err);
+      const errorMessage = err.response?.data?.message || err.message || 'Failed to delete invitation';
+      return { success: false, message: errorMessage };
     }
   };
 
   const resendInvite = async (inviteId: string) => {
     try {
-      await api.resendInvite(inviteId);
+      const response = await api.resendInvite(shaadiId, inviteId);
       await loadInvites(); // Refresh to get updated reminder count
-      return { success: true, message: 'Invitation resent successfully!' };
+      return { success: true, message: response?.message || 'Invitation resent successfully!' };
     } catch (err: any) {
-      throw new Error(err.message || 'Failed to resend invitation');
+      console.error('Resend invite error:', err);
+      const errorMessage = err.response?.data?.message || err.message || 'Failed to resend invitation';
+      return { success: false, message: errorMessage };
     }
   };
 

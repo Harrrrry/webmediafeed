@@ -34,7 +34,7 @@ const ShaadiCreatePage: React.FC = () => {
         
         // Check if user is a creator of any Shaadi
         const creatorMembership = userShaadis.find(membership => membership.role === UserRole.CREATOR);
-        
+        console.log("creatorMembership", userShaadis, creatorMembership);
         if (creatorMembership) {
           // User is a creator, show the invite page for their Shaadi
           setShaadi(creatorMembership.shaadi);

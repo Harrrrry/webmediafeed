@@ -165,14 +165,14 @@ export const api = {
     });
   },
 
-  deleteInvite: async (inviteId: string) => {
-    return request(`/shaadi/invites/${inviteId}`, {
+  deleteInvite: async (shaadiId: string, inviteId: string) => {
+    return request(`/shaadi/${shaadiId}/invites/${inviteId}`, {
       method: 'DELETE',
     });
   },
 
-  resendInvite: async (inviteId: string) => {
-    return request(`/shaadi/invites/${inviteId}/resend`, {
+  resendInvite: async (shaadiId: string, inviteId: string) => {
+    return request(`/shaadi/${shaadiId}/invites/${inviteId}/resend`, {
       method: 'POST',
     });
   },

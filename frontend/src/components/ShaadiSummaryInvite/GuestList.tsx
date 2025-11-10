@@ -113,7 +113,7 @@ const GuestList: React.FC<GuestListProps> = ({
                   secondary={
                     <Box>
                       <Typography variant="body2" color="text.secondary">
-                        {invite.relationship || 'Guest'} • {getSideLabel(invite.side)}
+                        {invite.relationship || 'Guest'}{invite.side && getSideLabel(invite.side) && ` • ${getSideLabel(invite.side)}`}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
                         {invite.guestEmail || invite.guestPhone || 'Contact not provided'}

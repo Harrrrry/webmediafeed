@@ -122,10 +122,10 @@ const GuestManagement: React.FC = () => {
   };
 
   const handleDeleteInvite = async () => {
-    if (!selectedInvite) return;
+    if (!selectedInvite || !currentShaadi) return;
     
     try {
-      await deleteInvite(selectedInvite.id);
+      await deleteInvite(currentShaadi._id, selectedInvite.id);
       setDeleteDialogOpen(false);
       setSelectedInvite(null);
       loadInvites(); // Refresh the list
@@ -135,8 +135,10 @@ const GuestManagement: React.FC = () => {
   };
 
   const handleResendInvite = async (inviteId: string) => {
+    if (!currentShaadi) return;
+    
     try {
-      await resendInvite(inviteId);
+      await resendInvite(currentShaadi._id, inviteId);
       loadInvites(); // Refresh to get updated reminder count
     } catch (err: any) {
       setError(err.message || 'Failed to resend invite');
@@ -166,7 +168,8 @@ const GuestManagement: React.FC = () => {
   };
 
   const getSideColor = (side: string) => {
-    return side === 'groom' ? 'primary' : 'secondary';
+    if (!side) return 'default';
+    return side === 'groom' ? 'primary' : 'error'; // error gives pink/red color for bride
   };
 
   const getStats = () => {
@@ -346,12 +349,21 @@ const GuestManagement: React.FC = () => {
                     </Typography>
                   </TableCell>
                   <TableCell>
-                    <Chip
-                      label={invite.side === 'groom' ? 'Groom Side' : 'Bride Side'}
-                      size="small"
-                      color={getSideColor(invite.side)}
-                      variant="outlined"
-                    />
+                    {invite.side ? (
+                      <Chip
+                        label={invite.side === 'groom' ? 'Groom Side' : 'Bride Side'}
+                        size="small"
+                        color={getSideColor(invite.side)}
+                        variant="outlined"
+                      />
+                    ) : (
+                      <Chip
+                        label="No Side Set"
+                        size="small"
+                        color="default"
+                        variant="outlined"
+                      />
+                    )}
                   </TableCell>
                   <TableCell>
                     <Chip

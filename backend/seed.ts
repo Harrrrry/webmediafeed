@@ -20,26 +20,40 @@ async function seed() {
     { username: 'bob', email: 'bob@example.com', passwordHash: 'test', profilePicUrl: '' },
   ]);
 
+  // Create a test shaadi first
+  const Shaadi = mongoose.model('Shaadi', require('./src/modules/shaadi/shaadi.schema').ShaadiSchema);
+  const testShaadi = await Shaadi.create({
+    name: 'Test Wedding',
+    brideName: 'Alice',
+    groomName: 'Bob',
+    date: new Date('2024-12-31'),
+    location: 'Test Location',
+    code: '123456',
+    createdBy: users[0]._id
+  });
+
   const posts = await Post.insertMany([
     {
       userId: users[0]._id,
-      mediaUrl: 'https://placekitten.com/400/300',
-      mediaType: 'image',
+      shaadiId: testShaadi._id,
+      mediaUrls: ['https://placekitten.com/400/300'],
+      mediaTypes: ['image'],
       caption: 'Cute kitten!',
       likes: [users[1]._id],
     },
     {
       userId: users[1]._id,
-      mediaUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
-      mediaType: 'video',
+      shaadiId: testShaadi._id,
+      mediaUrls: ['https://www.w3schools.com/html/mov_bbb.mp4'],
+      mediaTypes: ['video'],
       caption: 'Sample video',
       likes: [],
     },
   ]);
 
   await Comment.insertMany([
-    { postId: posts[0]._id, userId: users[1]._id, text: 'So cute!' },
-    { postId: posts[1]._id, userId: users[0]._id, text: 'Nice video!' },
+    { postId: posts[0]._id, userId: users[1]._id, shaadiId: testShaadi._id, text: 'So cute!' },
+    { postId: posts[1]._id, userId: users[0]._id, shaadiId: testShaadi._id, text: 'Nice video!' },
   ]);
 
   console.log('Mock data inserted!');

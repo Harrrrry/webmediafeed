@@ -69,15 +69,19 @@ export const useShaadiSummaryInvite = (shaadi: Shaadi) => {
     if (!inviteManagement.selectedInvite) return;
     
     const result = await inviteManagement.deleteInvite(inviteManagement.selectedInvite.id);
-    if (result) {
+    if (result.success) {
       errorHandling.handleSuccess(result.message);
+    } else {
+      errorHandling.handleError(result.message);
     }
   };
 
   const handleResendInvite = async (inviteId: string) => {
     const result = await inviteManagement.resendInvite(inviteId);
-    if (result) {
+    if (result.success) {
       errorHandling.handleSuccess(result.message);
+    } else {
+      errorHandling.handleError(result.message);
     }
   };
 

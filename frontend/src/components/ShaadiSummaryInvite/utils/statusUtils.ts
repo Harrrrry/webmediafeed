@@ -23,10 +23,12 @@ export const getStatusIcon = (status: InviteStatus): string => {
 };
 
 export const getSideColor = (side: GuestSide): string => {
-  return side === GuestSide.GROOM ? 'primary' : 'secondary';
+  if (!side) return 'default';
+  return side === GuestSide.GROOM ? 'primary' : 'error'; // error gives pink/red color for bride
 };
 
-export const getSideLabel = (side: GuestSide): string => {
+export const getSideLabel = (side: GuestSide): string | null => {
+  if (!side) return null;
   return side === GuestSide.GROOM ? 'Groom Side' : 'Bride Side';
 };
 

@@ -116,10 +116,12 @@ const ContactDirectory: React.FC = () => {
   };
 
   const getSideColor = (side?: string) => {
-    return side === 'groom' ? 'primary' : 'secondary';
+    if (!side) return 'default';
+    return side === 'groom' ? 'primary' : 'error'; // error gives pink/red color for bride
   };
 
   const getSideLabel = (side?: string) => {
+    if (!side) return null;
     return side === 'groom' ? 'Groom Side' : 'Bride Side';
   };
 
@@ -259,12 +261,14 @@ const ContactDirectory: React.FC = () => {
                       <Typography variant="subtitle1" fontWeight={600}>
                         {contact.name || 'Unknown User'}
                       </Typography>
-                      <Chip
-                        label={getSideLabel(contact.side)}
-                        size="small"
-                        color={getSideColor(contact.side)}
-                        variant="outlined"
-                      />
+                      {contact.side && (
+                        <Chip
+                          label={getSideLabel(contact.side)}
+                          size="small"
+                          color={getSideColor(contact.side)}
+                          variant="outlined"
+                        />
+                      )}
                       {contact.role === 'creator' && (
                         <Chip
                           label="Creator"

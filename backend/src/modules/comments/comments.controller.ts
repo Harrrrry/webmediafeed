@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Delete, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, UseGuards, Req, Query } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CommentsService } from './comments.service';
 import { Request } from 'express';
@@ -8,20 +8,22 @@ export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
 
   @Get('post/:postId')
-  findByPost(@Param('postId') postId: string) {
-    return this.commentsService.findByPost(postId);
+  findByPost(@Param('postId') postId: string, @Query('shaadiId') shaadiId: string) {
+    if (!shaadiId) throw new Error('shaadiId is required');
+    return this.commentsService.findByPost(postId, shaadiId);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('post/:postId')
   create(
     @Param('postId') postId: string,
-    @Body() dto: { text: string },
+    @Body() dto: { shaadiId: string; text: string },
     @Req() req: Request,
   ) {
+    if (!dto.shaadiId) throw new Error('shaadiId is required');
     // @ts-ignore
     const userId = req.user.userId;
-    return this.commentsService.create(postId, userId, dto.text);
+    return this.commentsService.create(postId, userId, dto.shaadiId, dto.text);
   }
 
   @UseGuards(JwtAuthGuard)

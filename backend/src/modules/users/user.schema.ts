@@ -16,6 +16,12 @@ export class User {
 
   @Prop()
   profilePicUrl: string;
+
+  @Prop()
+  phone: string;
+
+  @Prop()
+  gender: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User); 

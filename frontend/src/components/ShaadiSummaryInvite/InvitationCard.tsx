@@ -51,15 +51,10 @@ const InvitationCard: React.FC<InvitationCardProps> = ({
       >
         {sharingCard ? 'Creating Image...' : 'Share Invitation Card'}
       </Button>
-
-      {/* Creator Code */}
       <Paper elevation={2} sx={{ p: 2, mb: 3, borderRadius: 2 }}>
-        <Typography variant="body2" color="text.secondary" gutterBottom>
-          Your Creator Code:
-        </Typography>
-        <Typography variant="h6" fontWeight={700} color="primary">
-          {creatorCode}
-        </Typography>
+      <Typography variant="body2" color="text.secondary">
+            Your Creator Code: <Typography component="span" variant="h6" fontWeight={700} color="primary">{creatorCode}</Typography>
+          </Typography>
       </Paper>
     </>
   );

@@ -143,7 +143,10 @@ const ShaadiSummaryInvite: React.FC<{ shaadi: any; onInvite: (contact: string) =
       >
         <MenuItem onClick={() => {
           if (selectedInvite) {
-            navigator.clipboard.writeText(selectedInvite.inviteLink);
+            // Construct invite link if not available
+            const inviteLink = selectedInvite.inviteLink || 
+              `${window.location.origin}/join/${selectedInvite.inviteCode}`;
+            navigator.clipboard.writeText(inviteLink);
             handleSuccess('Invite link copied!');
           }
           setInviteMenuAnchor(null);

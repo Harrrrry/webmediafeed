@@ -1,0 +1,64 @@
+version: '3.8'
+
+# Development services
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: webmediafeed_mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: webmediafeed_user
+      MONGO_INITDB_ROOT_PASSWORD: webmediafeed_password
+      MONGO_INITDB_DATABASE: webmediafeed
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - webmediafeed_network
+
+  # Development backend
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: webmediafeed_backend
+    environment:
+      - NODE_ENV=development
+      - MONGODB_URI=mongodb://webmediafeed_user:webmediafeed_password@mongodb:27017/webmediafeed?authSource=admin
+      - JWT_SECRET=your-super-secret-jwt-key-change-in-production
+      - FRONTEND_URL=http://localhost:5173
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./backend:/usr/src/app
+      - ./uploads:/usr/src/app/uploads  # Share uploads directory
+      - /usr/src/app/node_modules
+    depends_on:
+      - mongodb
+    networks:
+      - webmediafeed_network
+
+  # Development frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: webmediafeed_frontend
+    environment:
+      - VITE_API_URL=http://localhost:5000
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - backend
+    networks:
+      - webmediafeed_network
+
+networks:
+  webmediafeed_network:
+    driver: bridge
+
+volumes:
+  mongodb_data:

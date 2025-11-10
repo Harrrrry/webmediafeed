@@ -19,18 +19,18 @@ export function useGuestManagement() {
     }
   };
 
-  const deleteInvite = async (inviteId: string) => {
+  const deleteInvite = async (shaadiId: string, inviteId: string) => {
     try {
-      const response = await api.deleteInvite(inviteId);
+      const response = await api.deleteInvite(shaadiId, inviteId);
       return response;
     } catch (error: any) {
       throw new Error(error.message || 'Failed to delete invite');
     }
   };
 
-  const resendInvite = async (inviteId: string) => {
+  const resendInvite = async (shaadiId: string, inviteId: string) => {
     try {
-      const response = await api.resendInvite(inviteId);
+      const response = await api.resendInvite(shaadiId, inviteId);
       return response;
     } catch (error: any) {
       throw new Error(error.message || 'Failed to resend invite');

@@ -47,9 +47,20 @@ const InvitePage = () => {
   
   // If current Shaadi exists, show the invite page
   if (currentShaadi) {
+    // Find the user's membership for the current shaadi to get creator code
+    const currentMembership = userShaadis.find(membership => 
+      membership.shaadi._id === currentShaadi._id || membership.shaadi.id === currentShaadi.id
+    );
+    
+    // Add creator code to shaadi object if user is creator
+    const shaadiWithCode = {
+      ...currentShaadi,
+      creatorCode: currentMembership?.code || currentShaadi.creatorCode
+    };
+    
     return (
       <ShaadiSummaryInvite 
-        shaadi={currentShaadi} 
+        shaadi={shaadiWithCode} 
         onInvite={() => {}} 
         onSkip={() => navigate('/')} 
       />
